@@ -2,14 +2,19 @@
 require 'launchy'
 
 def main
-  puts "Input your email:"
-  email = gets.chomp
+  puts "\nWelcome to the URL Shortener!"
+  puts "\nEnter your email:"
+  print ">> "
+  user_email = gets.chomp
 
-  user = User.find_by(email: email)
+  user = User.find_by(email: user_email)
 
-  puts "What do you want to do?"
+  new_user(user_email) if user.nil?
+
+  puts "\nWhat do you want to do?"
   puts "0. Create shortened URL"
   puts "1. Visit shortened URL"
+  print ">> "
   response = gets.chomp
 
   case response
@@ -22,17 +27,45 @@ end
 
 def create_shortened_url(user)
   puts "Type in your long url"
+  print ">> "
   long_url = gets.chomp
   short_url_obj = ShortenedUrl.create_for_user_and_long_url!(user, long_url)
   puts "The short url is: #{short_url_obj.short_url}"
 end
 
 def visit_shortened_url(user)
-  puts "Type in your short url"
+  puts "\nType in your short url."
+  print ">> "
   short_url = gets.chomp
+
   url_obj = ShortenedUrl.find_by(short_url: short_url)
-  long_url = url_obj.long_url
-  Launchy.open(long_url)
+
+  if url_obj.nil?
+    puts "That url does not exist. \n"
+    visit_shortened_url(user)
+  else
+    Visit.record_visit(user, url_obj)
+    long_url = url_obj.long_url
+    puts "\nRedirecting to #{long_url}"
+    Launchy.open(long_url) unless long_url.nil?
+  end
+end
+
+def new_user(new_user_email)
+  puts "You aren't a registered user."
+  puts "Would you like to be one?"
+  print ">> "
+
+  new_user_response = gets.chomp
+  new_user_response.downcase!
+
+  until ["yes", "y", "sure", "ok"].include?(new_user_response)
+    new_user(new_user_email)
+  end
+
+  User.create!(email: new_user_email)
+
+  puts "User account for #{new_user_email} created!"
 end
 
 main

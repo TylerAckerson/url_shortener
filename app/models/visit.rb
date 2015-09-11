@@ -2,11 +2,11 @@
 #
 # Table name: visits
 #
-#  id         :integer          not null, primary key
-#  user_id    :integer
-#  short_url  :string
-#  created_at :datetime
-#  updated_at :datetime
+#  id               :integer          not null, primary key
+#  user_id          :integer
+#  created_at       :datetime
+#  updated_at       :datetime
+#  shortened_url_id :integer
 #
 
 class Visit < ActiveRecord::Base
@@ -20,9 +20,8 @@ class Visit < ActiveRecord::Base
      foreign_key: :shortened_url_id,
      primary_key: :id
 
-  def self.record_visit(user, shortened_url)
-    create!(user_id: user.id, short_url: shortened_url)
+  def self.record_visit(user, short_url)
+    create!(user_id: user.id, shortened_url_id: short_url.id)
   end
-
 
 end

@@ -47,14 +47,14 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_clicks
-    self.visits.count
+    visits.count
   end
 
   def num_clicks_unique
-    self.visitors.count
+    visitors.count
   end
 
   def clicks_since(mins)
-    self.visits.where('created_at > ?', (Time.now - mins.minutes)).count
+    visits.where('created_at > ?', (Time.now - mins.minutes)).count
   end
 end
